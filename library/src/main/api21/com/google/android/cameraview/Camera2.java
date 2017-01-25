@@ -59,6 +59,9 @@ class Camera2 extends CameraViewImpl {
 
         @Override
         public void onOpened(@NonNull CameraDevice camera) {
+            Log.d("test", "===");
+            Log.d("test", "OLD camera: " + mCamera);
+            Log.d("test", "NEW camera: " + camera);
             mCamera = camera;
             mCallback.onCameraOpened();
             startCaptureSession();
@@ -66,11 +69,16 @@ class Camera2 extends CameraViewImpl {
 
         @Override
         public void onClosed(@NonNull CameraDevice camera) {
+            Log.d("test", "CLOSE camera: " + camera);
             mCallback.onCameraClosed();
         }
 
         @Override
         public void onDisconnected(@NonNull CameraDevice camera) {
+            Log.d("test", "DISC camera: " + camera);
+            if (camera != null) {
+                camera.close();
+            }
             mCamera = null;
         }
 
@@ -214,6 +222,8 @@ class Camera2 extends CameraViewImpl {
             mCaptureSession = null;
         }
         if (mCamera != null) {
+            Log.d("test", "STOP: " + this.toString());
+            Log.d("test", "STOP close camera: " + mCamera.toString());
             mCamera.close();
             mCamera = null;
         }
@@ -450,6 +460,8 @@ class Camera2 extends CameraViewImpl {
         if (!isCameraOpened() || !mPreview.isReady() || mImageReader == null) {
             return;
         }
+        Log.d("test", "START startCaptureSession: " + this.toString());
+        Log.d("test", "START mCamera: " + mCamera.toString());
         Size previewSize = chooseOptimalSize();
         mPreview.setBufferSize(previewSize.getWidth(), previewSize.getHeight());
         Surface surface = mPreview.getSurface();
@@ -459,6 +471,7 @@ class Camera2 extends CameraViewImpl {
             mCamera.createCaptureSession(Arrays.asList(surface, mImageReader.getSurface()),
                     mSessionCallback, null);
         } catch (CameraAccessException e) {
+            Log.e("test", "START startCaptureSession Ex: " + e);
             throw new RuntimeException("Failed to start camera session");
         }
     }
